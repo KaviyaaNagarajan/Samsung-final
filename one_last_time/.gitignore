@@ -1,0 +1,7 @@
+.env
+__pycache__/
+.DS_Store
+
+# Ignore files that may contain secrets or lockfiles
+setup_keys.ps1
+uv.lock

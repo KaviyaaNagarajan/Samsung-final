@@ -1,0 +1,23 @@
+behavior_task:
+  description: >
+    Analyze {company} history and identify strategic behavior patterns.
+  expected_output: >
+    A detailed behavioral profile of {company}.
+
+roadmap_task:
+  description: >
+    Using behavior patterns and market signals, predict the future roadmap of {company}.
+  expected_output: >
+    A list of upcoming features, products, and innovation directions.
+
+pricing_task:
+  description: >
+    Predict upcoming price changes and discount strategies of {company}.
+  expected_output: >
+    Expected price hikes, cuts, and discount windows.
+
+launch_task:
+  description: >
+    Predict the probability and timeline of the next product launch by {company}.
+  expected_output: >
+    A timeline with probability scores for upcoming launches.

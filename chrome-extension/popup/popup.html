@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samsung Prism</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🧬 SAMSUNG PRISM</h1>
+      <p class="subtitle">Multi-Crew Intelligence System</p>
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-section">
+      <div class="input-group">
+        <label for="focalCompany">Focal Company</label>
+        <input 
+          type="text" 
+          id="focalCompany" 
+          placeholder="Enter focal company (e.g., Samsung)"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="competitors">Competitor Companies (max 3)</label>
+        <input 
+          type="text" 
+          id="competitor1" 
+          placeholder="Competitor 1 (e.g., Apple)"
+        />
+        <input 
+          type="text" 
+          id="competitor2" 
+          placeholder="Competitor 2 (e.g., Xiaomi)"
+        />
+        <input 
+          type="text" 
+          id="competitor3" 
+          placeholder="Competitor 3 (e.g., Google)"
+        />
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-section">
+      <button class="crew-btn" id="btn-crew1" data-crew="comp_analysis">
+        <span class="btn-icon">🔍</span>
+        <span class="btn-text">Run Competitor Intelligence</span>
+        <span class="btn-loader" style="display: none;">⏳</span>
+      </button>
+
+      <button class="crew-btn" id="btn-crew2" data-crew="digital_twin">
+        <span class="btn-icon">🧬</span>
+        <span class="btn-text">Run Digital Twin</span>
+        <span class="btn-loader" style="display: none;">⏳</span>
+      </button>
+
+      <button class="crew-btn" id="btn-crew3" data-crew="one_last_time">
+        <span class="btn-icon">⚔️</span>
+        <span class="btn-text">Run War Simulation</span>
+        <span class="btn-loader" style="display: none;">⏳</span>
+      </button>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <!-- Results will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <script src="../utils/api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

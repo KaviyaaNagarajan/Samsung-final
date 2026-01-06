@@ -1,0 +1,51 @@
+from samsung_prsim, run :
+python -m venv venv
+activate the venv :
+venv/Scripts/activate
+
+
+
+uv pip install crewai
+uv pip install 'crewai[tools]'
+uv tool list
+python -m pip install fastapi uvicorn
+pip install pyyaml
+
+(cloning)
+
+
+
+
+for digital_twin:
+run from src
+
+command to run : uvicorn twin.backend.api:app --port 8001
+
+
+
+for one last time :
+run from src
+command to run : uvicorn backend.app:app --reload --port 8003
+
+
+
+for comp_analysis
+run from src
+uvicorn samsung_prism.backend.app:app --reload --port 8000
+
+
+
+CHROME extension:
+
+📦 Loading the Extension for 1st time
+
+Open Chrome/Edge
+Go to chrome://extensions/
+Enable "Developer mode" (top right)
+Click "Load unpacked"
+Select the chrome-extension folder: C:\CHAINAIM3003\mcp-servers\SamsungPrism\chrome-extension
+Done! Click the extension icon in your browser toolbar
+
+
+from next time, go directly to chrome
+load the extension in Chrome (chrome://extensions → click reload icon)

@@ -1,0 +1,26 @@
+[project]
+name = "samsung_prism"
+version = "0.1.0"
+description = "samsung_prism using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.7.2",
+    "fastapi>=0.95",
+    "uvicorn[standard]>=0.22"
+]
+
+[project.scripts]
+samsung_prism = "samsung_prism.main:run"
+run_crew = "samsung_prism.main:run"
+train = "samsung_prism.main:train"
+replay = "samsung_prism.main:replay"
+test = "samsung_prism.main:test"
+run_with_trigger = "samsung_prism.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

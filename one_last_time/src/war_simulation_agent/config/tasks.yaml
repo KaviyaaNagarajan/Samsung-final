@@ -1,0 +1,83 @@
+# WAR SIMULATION CREW — TASKS
+# Core strategic simulation tasks
+
+# War Simulation Tasks
+simulate_competitive_moves:
+  description: >
+    Simulate a focal company's competitive moves and counter-moves
+    using game theory principles in response to actions by competitors
+    in the target market.
+
+    For the given scenario, analyze:
+    1. Initial competitor move (pricing, feature launch, or marketing shift)
+    2. The focal company's possible response options
+    3. Likely competitor counter-moves
+    4. Game theory analysis (dominant strategies, Nash equilibrium)
+    5. Timing considerations (first-mover vs fast-follower)
+
+    Ensure the simulation considers:
+    - Flagship and mid-range product line positioning
+    - Competitor incentives and constraints
+    - Market timing and launch cycles
+    - The focal company's ecosystem or product advantages
+  expected_output: >
+    A decision brief for the focal company including:
+    - Competitor move summary
+    - Recommended strategic response
+    - Expected competitor counter-response
+    - Dominant strategy / Nash equilibrium insight
+    - Confidence score (0–1)
+  agent: game_theory_agent
+
+analyze_market_impact:
+  description: >
+    Analyze the market and business impact of competitive scenarios
+    on Samsung Galaxy smartphones in India.
+
+    For each scenario, evaluate:
+    1. Revenue impact for Samsung (short-term and medium-term)
+    2. Customer churn risk to competitors vs Samsung
+    3. Market share changes across premium and mid-range segments
+    4. Adoption impact for Galaxy S and Galaxy A series
+
+    Provide estimates for:
+    - Revenue impact (₹ / % range)
+    - Change in adoption rate
+    - Market share movement
+    - Impact timeline (30 / 60 / 90 days, 1 year)
+  expected_output: >
+    A quantified Samsung market impact summary including:
+    - Recommended Samsung action
+    - Revenue impact range (₹ / %)
+    - Adoption and churn impact
+    - Market share shift estimate
+    - Risk level (High / Medium / Low)
+  agent: market_impact_agent
+
+risk_assessment:
+  description: >
+    Conduct a competitive risk assessment for Samsung Galaxy smartphones
+    based on the simulated competitive scenario.
+
+    Identify:
+    1. Worst-case outcomes (price wars, margin erosion, brand dilution)
+    2. Aggressive competitor retaliation risks
+    3. Supply chain or inventory risks
+    4. Regulatory or market sentiment risks
+    5. Long-term strategic risks to Samsung's brand and ecosystem
+
+    For each identified risk, assess:
+    - Severity (High / Medium / Low)
+    - Probability
+    - Business impact
+    - Early warning indicators
+    - Mitigation and contingency strategies
+  expected_output: >
+    A Samsung executive risk matrix including:
+    - Top 5 competitive risks
+    - Severity × probability ranking
+    - Early warning signals to monitor
+    - Clear mitigation strategies
+    - Overall risk posture assessment
+  agent: risk_analyzer
+

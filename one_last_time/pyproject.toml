@@ -1,0 +1,22 @@
+[project]
+name = "war_simulation_agent"
+version = "0.1.0"
+description = "War simulation agent using CrewAI"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "crewai[tools]==1.7.1",
+  "litellm>=1.0.0"
+]
+
+[project.scripts]
+run_crew = "war_simulation_agent.main:run"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
+
