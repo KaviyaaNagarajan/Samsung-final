@@ -1,4 +1,4 @@
-from samsung_prsim, run :
+from Samsung-final, run :
 python -m venv venv
 activate the venv :
 venv/Scripts/activate
@@ -11,9 +11,11 @@ uv tool list
 python -m pip install fastapi uvicorn
 pip install pyyaml
 
-(cloning)
+set the .env in each folders,
+comp_analysis, digital_twin, one_last_time
 
 
+All setup , start the exectuion 
 
 
 for digital_twin:
