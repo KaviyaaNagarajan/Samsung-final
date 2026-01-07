@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Samsung Prism - Crew Intelligence",
-  "version": "1.0.0",
-  "description": "Multi-crew competitive intelligence dashboard",
+  "name": "Samsung Prism Intelligence",
+  "version": "2.0.0",
+  "description": "AI-powered competitive intelligence platform with LLM-enhanced insights",
   "permissions": [
     "storage"
   ],
   "host_permissions": [
     "http://localhost:8000/*",
-    "http://localhost:8002/*",
-    "http://localhost:8003/*"
+    "http://localhost:8001/*",
+    "http://localhost:8003/*",
+    "https://api.groq.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
@@ -23,5 +24,14 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["results/results.html", "results/results.css", "results/results.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

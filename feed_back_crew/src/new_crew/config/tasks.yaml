@@ -1,0 +1,41 @@
+collect_user_feedback:
+  description: >
+    Find real user feedback about {{ company_name }}.
+    Use Serper Search 2 times only, then write your summary.
+    Search 1: {{ company_name }} customer reviews
+    Search 2: {{ company_name }} complaints
+    After 2 searches, stop searching and summarize what you found: positive feedback, negative feedback, common complaints, repeated praise.
+
+  expected_output: >
+    Brief summary with positive themes, negative themes, common complaints, and repeated praise from search results.
+
+  agent: feedback_collector
+
+analyze_industry_feedback:
+  description: >
+    Find industry perception of {{ company_name }}.
+    Use Serper Search 2 times only, then write your summary.
+    Search 1: {{ company_name }} industry analysis
+    Search 2: {{ company_name }} market positioning
+    After 2 searches, stop searching and summarize what you found: industry strengths, weaknesses, market positioning, analyst sentiment.
+
+  expected_output: >
+    Brief summary with industry strengths, weaknesses, market positioning, and analyst sentiment from search results.
+
+  agent: industry_analyst
+
+
+
+synthesize_final_insights:
+  description: >
+    Combine the user feedback and industry analysis from previous tasks into a concise executive summary for {{ company_name }}.
+    Synthesize the key insights into actionable intelligence.
+
+  expected_output: >
+    Executive summary with:
+    - Key strengths
+    - Major weaknesses
+    - Reputation risks
+    - Strategic recommendations
+
+  agent: insight_synthesizer

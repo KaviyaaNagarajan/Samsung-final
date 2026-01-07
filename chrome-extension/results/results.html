@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samsung Prism - Results</title>
+  <link rel="stylesheet" href="results.css">
+  
+  <!-- Markdown parsing and sanitization libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="header-bar">
+    <button class="back-btn" id="backBtn">
+      <span>←</span>
+      <span>Back to Dashboard</span>
+    </button>
+    <div class="header-center">
+      <h1 class="crew-name" id="crewName">Loading...</h1>
+      <span class="status-badge" id="statusBadge">✓ Success</span>
+    </div>
+    <div class="header-right">
+      <span class="timestamp" id="timestamp"></span>
+      <button class="export-btn" id="exportBtn">
+        <span>📥</span>
+        <span>Export</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-icon">🧭</span>
+        <span class="sidebar-title">Navigation</span>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Navigation buttons will be dynamically inserted -->
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area" id="contentArea">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading results...</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="results.js"></script>
+</body>
+</html>

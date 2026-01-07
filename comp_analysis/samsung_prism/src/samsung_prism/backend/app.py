@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
 from samsung_prism.crew import SamsungCompetitorIntelligenceCrew
 
 app = FastAPI(
@@ -42,14 +43,19 @@ def health_check():
 # Run Intelligence Analysis
 # -----------------------------
 @app.post("/analyze", response_model=IntelligenceResponse)
-def analyze(payload: IntelligenceRequest):
+def analyze(payload: IntelligenceRequest, x_groq_api_key: str | None = Header(None, alias="X-Groq-Api-Key")):
     if not payload.our_company or not payload.competitors:
         raise HTTPException(
             status_code=400,
             detail="our_company and competitors are required"
         )
 
+    old_key = os.environ.get("GROQ_API_KEY")
     try:
+        # Temporarily set GROQ_API_KEY if provided by client
+        if x_groq_api_key:
+            os.environ["GROQ_API_KEY"] = x_groq_api_key
+
         crew_instance = SamsungCompetitorIntelligenceCrew()
         crew = crew_instance.crew()
 
@@ -74,7 +80,16 @@ def analyze(payload: IntelligenceRequest):
         )
 
     except Exception as e:
+        msg = str(e)
+        if "Invalid API key" in msg or "Invalid API Key" in msg or "invalid_api_key" in msg:
+            raise HTTPException(status_code=401, detail="Invalid Groq API key provided")
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail=msg
         )
+    finally:
+        # Restore previous env var
+        if old_key is None:
+            os.environ.pop("GROQ_API_KEY", None)
+        else:
+            os.environ["GROQ_API_KEY"] = old_key

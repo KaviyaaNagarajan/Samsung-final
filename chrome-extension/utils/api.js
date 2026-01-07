@@ -14,7 +14,7 @@ const API_CONFIG = {
     ]
   },
   digital_twin: {
-    port: 8002,
+    port: 8001,
     endpoint: '/run',
     name: 'Digital Twin Crew',
     needsFocalCompany: false,
@@ -41,8 +41,263 @@ const API_CONFIG = {
   }
 };
 
-// API Call Function
-async function callCrewAPI(crewName, focalCompany, competitors) {
+// Groq API Configuration
+const GROQ_CONFIG = {
+  endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+  competitorModel: 'llama-3.3-70b-versatile',
+  summaryModel: 'llama-3.3-70b-versatile',
+  competitorMaxTokens: 50,
+  summaryMaxTokens: 500,
+  competitorTemperature: 0.3,
+  summaryTemperature: 0.5,
+  competitorSystemPrompt: 'You are a business analyst. Provide only competitor company names, nothing else. No explanations, no formatting, no numbering.',
+  summarySystemPrompt: 'You are an executive business analyst specializing in competitive intelligence. Your task is to extract the most critical, actionable insights from reports and present them as concise bullet points.'
+};
+
+// ==================== GROQ API - COMPETITOR DISCOVERY ====================
+
+async function getCompetitorSuggestions(focalCompany, category, apiKey) {
+  if (!apiKey) {
+    throw new Error('API key is required');
+  }
+  
+  const userPrompt = `List exactly 3 top competitors of ${focalCompany} in the ${category} industry. Return only company names separated by newlines.`;
+  
+  const payload = {
+    model: GROQ_CONFIG.competitorModel,
+    messages: [
+      {
+        role: 'system',
+        content: GROQ_CONFIG.competitorSystemPrompt
+      },
+      {
+        role: 'user',
+        content: userPrompt
+      }
+    ],
+    max_tokens: GROQ_CONFIG.competitorMaxTokens,
+    temperature: GROQ_CONFIG.competitorTemperature,
+    stop: ['\n\n']
+  };
+  
+  console.log('Calling Groq API for competitor suggestions...');
+  
+  try {
+    const response = await fetch(GROQ_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(handleGroqError(response.status, errorText));
+    }
+    
+    const data = await response.json();
+    
+    if (data.usage) {
+      console.log('Token usage:', data.usage);
+    }
+    
+    const competitors = parseGroqResponse(data);
+    
+    console.log('Competitors found:', competitors);
+    
+    return competitors;
+    
+  } catch (error) {
+    console.error('Groq API Error:', error);
+    throw error;
+  }
+}
+
+function parseGroqResponse(response) {
+  try {
+    const content = response.choices[0].message.content;
+    
+    if (!content) {
+      throw new Error('Empty response from AI');
+    }
+    
+    console.log('Raw AI response:', content);
+    
+    let lines = content.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    lines = lines.map(line => line.replace(/^\d+\.\s*/, '').trim());
+    lines = lines.map(line => line.replace(/\*\*/g, '').replace(/\*/g, '').trim());
+    lines = lines.map(line => line.replace(/^[-•]\s*/, '').trim());
+    lines = lines.filter(line => line.length > 0);
+    
+    if (lines.length < 3) {
+      throw new Error(`Expected 3 competitors, got ${lines.length}. Response: ${content}`);
+    }
+    
+    const competitors = lines.slice(0, 3);
+    
+    competitors.forEach(name => {
+      if (name.length < 2 || name.length > 50) {
+        throw new Error(`Invalid competitor name: ${name}`);
+      }
+    });
+    
+    return competitors;
+    
+  } catch (error) {
+    console.error('Error parsing Groq response:', error);
+    throw new Error(`Failed to parse AI response: ${error.message}`);
+  }
+}
+
+// ==================== GROQ API - EXECUTIVE SUMMARY GENERATION ====================
+
+async function generateExecutiveSummary(fullText, apiKey) {
+  if (!apiKey) {
+    console.warn('No API key provided for executive summary generation');
+    return [];
+  }
+  
+  if (!fullText || fullText.trim().length < 100) {
+    console.warn('Text too short for executive summary');
+    return [];
+  }
+  
+  // Truncate text if too long (keep first 4000 chars for context)
+  const textToAnalyze = fullText.length > 4000 ? fullText.substring(0, 4000) + '...' : fullText;
+  
+  const userPrompt = `Analyze the following competitive intelligence report and generate EXACTLY 6 key takeaways.
+
+Requirements:
+- Each point must be 10-15 words maximum
+- Focus on actionable insights and strategic implications
+- Use clear, concise business language
+- Start each point with a strong action verb or key finding
+- Number each point 1-6
+- NO additional commentary or explanations
+
+Report:
+${textToAnalyze}
+
+Provide ONLY the 6 numbered bullet points, nothing else.`;
+  
+  const payload = {
+    model: GROQ_CONFIG.summaryModel,
+    messages: [
+      {
+        role: 'system',
+        content: GROQ_CONFIG.summarySystemPrompt
+      },
+      {
+        role: 'user',
+        content: userPrompt
+      }
+    ],
+    max_tokens: GROQ_CONFIG.summaryMaxTokens,
+    temperature: GROQ_CONFIG.summaryTemperature
+  };
+  
+  console.log('Calling Groq API for executive summary...');
+  
+  try {
+    const response = await fetch(GROQ_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API error:', errorText);
+      return [];
+    }
+    
+    const data = await response.json();
+    
+    if (data.usage) {
+      console.log('Summary token usage:', data.usage);
+    }
+    
+    const summary = parseExecutiveSummary(data);
+    
+    console.log('Executive summary generated:', summary);
+    
+    return summary;
+    
+  } catch (error) {
+    console.error('Error generating executive summary:', error);
+    return [];
+  }
+}
+
+function parseExecutiveSummary(response) {
+  try {
+    const content = response.choices[0].message.content;
+    
+    if (!content) {
+      return [];
+    }
+    
+    console.log('Raw summary response:', content);
+    
+    // Split by newlines and clean
+    let lines = content.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    // Remove numbering and formatting
+    const bullets = lines.map(line => {
+      // Remove: "1.", "1)", "(1)", "**1.**", etc.
+      let cleaned = line.replace(/^[\s]*[\*\(]?\d+[\.\)\*\:]\s*[\*]?/, '');
+      // Remove markdown bold
+      cleaned = cleaned.replace(/^\*\*/, '').replace(/\*\*$/, '');
+      // Remove bullet symbols
+      cleaned = cleaned.replace(/^[-•*]\s*/, '');
+      return cleaned.trim();
+    }).filter(line => line.length > 5); // Filter out very short lines
+    
+    // Take exactly 6 points (or pad if less)
+    const finalBullets = bullets.slice(0, 6);
+    
+    // If we got less than 6, that's okay - return what we have
+    return finalBullets;
+    
+  } catch (error) {
+    console.error('Error parsing executive summary:', error);
+    return [];
+  }
+}
+
+function handleGroqError(status, errorText) {
+  switch (status) {
+    case 401:
+      return 'Invalid API key. Please check your settings.';
+    case 429:
+      return 'Rate limit exceeded. Please try again in a few minutes.';
+    case 500:
+    case 502:
+    case 503:
+      return 'AI service temporarily unavailable. Please try again.';
+    default:
+      try {
+        const errorData = JSON.parse(errorText);
+        return errorData.error?.message || `API Error: ${status}`;
+      } catch {
+        return `API Error: ${status} - ${errorText}`;
+      }
+  }
+}
+
+// ==================== CREW API CALLS ====================
+
+async function callCrewAPI(crewName, focalCompany, competitors, apiKey = null) {
   const config = API_CONFIG[crewName];
   if (!config) {
     throw new Error(`Unknown crew: ${crewName}`);
@@ -52,9 +307,7 @@ async function callCrewAPI(crewName, focalCompany, competitors) {
   
   let payload;
 
-  // ✅ BUILD CORRECT PAYLOAD FOR EACH CREW
   if (crewName === 'comp_analysis') {
-    // Comp Analysis expects: our_company + competitors
     if (!focalCompany || focalCompany.trim() === '') {
       throw new Error('Focal company is required for Competitor Intelligence');
     }
@@ -64,7 +317,6 @@ async function callCrewAPI(crewName, focalCompany, competitors) {
     };
   } 
   else if (crewName === 'digital_twin') {
-    // Digital Twin expects: companies (list)
     const allCompanies = competitors.filter(c => c && c.trim() !== '');
     if (allCompanies.length === 0) {
       throw new Error('At least one competitor is required for Digital Twin');
@@ -74,33 +326,32 @@ async function callCrewAPI(crewName, focalCompany, competitors) {
     };
   } 
   else if (crewName === 'one_last_time') {
-    // ✅ NEW: War Simulation expects: our_company, competitors (exactly 3), market_segment
     if (!focalCompany || focalCompany.trim() === '') {
       throw new Error('Focal company is required for War Simulation');
     }
     
     const validCompetitors = competitors.filter(c => c && c.trim() !== '');
     
-    // ✅ Validate exactly 3 competitors
-    if (validCompetitors.length !== 3) {
-      throw new Error('War Simulation requires exactly 3 competitors. Please fill all 3 competitor fields.');
-    }
-    
     payload = {
-      our_company: focalCompany,  // ✅ Changed from competitive_scenario
+      our_company: focalCompany,
       competitors: validCompetitors,
       market_segment: "India"
     };
   }
 
-  console.log(`Calling ${crewName} API:`, url, payload);
+  console.log(`Calling ${crewName} API:`, url, payload, apiKey ? '[Groq key provided]' : '[no Groq key]');
 
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (apiKey) {
+      headers['X-Groq-Api-Key'] = apiKey;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(payload)
     });
 
@@ -111,7 +362,6 @@ async function callCrewAPI(crewName, focalCompany, competitors) {
 
     const data = await response.json();
     
-    // Parse the response based on crew type
     return parseCrewResponse(crewName, data, config);
     
   } catch (error) {
@@ -120,18 +370,15 @@ async function callCrewAPI(crewName, focalCompany, competitors) {
   }
 }
 
-// ✅ PARSE RESPONSE BASED ON CREW TYPE
 function parseCrewResponse(crewName, data, config) {
   let summary = '';
   let agents = {};
 
   if (crewName === 'comp_analysis') {
-    // Response: { agent_outputs: {}, final_output: "" }
     summary = data.final_output || 'Analysis completed';
     agents = parseAgentOutputs(data.agent_outputs, config.agents);
     
   } else if (crewName === 'digital_twin') {
-    // Response: { results: { "CompanyName": { final_decision: "", agents: {} } } }
     const results = data.results || {};
     const firstCompany = Object.keys(results)[0];
     
@@ -143,15 +390,11 @@ function parseCrewResponse(crewName, data, config) {
     }
     
   } else if (crewName === 'one_last_time') {
-    // ✅ NEW: Response now has { status, execution_time, final_output, agent_outputs }
-    // This matches the comp_analysis format
     summary = data.final_output || data.result || 'Simulation completed';
     
-    // ✅ NEW: Parse real agent outputs instead of placeholders
     if (data.agent_outputs && Object.keys(data.agent_outputs).length > 0) {
       agents = parseAgentOutputs(data.agent_outputs, config.agents);
     } else {
-      // Fallback to placeholders only if no agent_outputs received
       config.agents.forEach(agentName => {
         agents[agentName] = {
           output: 'Agent output not available in API response',
@@ -173,12 +416,10 @@ function parseCrewResponse(crewName, data, config) {
   };
 }
 
-// Parse agent outputs from various formats
 function parseAgentOutputs(agentData, agentNames) {
   const agents = {};
   
   if (!agentData) {
-    // No agent data - create placeholders
     agentNames.forEach(agentName => {
       agents[agentName] = {
         output: 'Agent output not available in API response',
@@ -189,7 +430,6 @@ function parseAgentOutputs(agentData, agentNames) {
   }
 
   if (typeof agentData === 'object') {
-    // If it's already an object with agent names as keys
     Object.keys(agentData).forEach(agentKey => {
       const output = agentData[agentKey];
       agents[agentKey] = {
@@ -198,7 +438,6 @@ function parseAgentOutputs(agentData, agentNames) {
       };
     });
   } else if (Array.isArray(agentData)) {
-    // If it's an array of task outputs
     agentData.forEach((task, index) => {
       const agentName = agentNames[index] || `Agent ${index + 1}`;
       agents[agentName] = {
@@ -214,5 +453,8 @@ function parseAgentOutputs(agentData, agentNames) {
 // Export functions
 window.API = {
   callCrewAPI,
-  API_CONFIG
+  getCompetitorSuggestions,
+  generateExecutiveSummary,
+  API_CONFIG,
+  GROQ_CONFIG
 };

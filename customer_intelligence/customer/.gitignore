@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# CrewAI / AI cache
+knowledge/
+*.db
+*.sqlite
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# UV
+.uv/

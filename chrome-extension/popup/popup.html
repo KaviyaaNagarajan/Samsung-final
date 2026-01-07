@@ -10,65 +10,178 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🧬 SAMSUNG PRISM</h1>
+      <div class="logo-container">
+        <span class="logo-icon">🧬</span>
+        <h1>SAMSUNG PRISM</h1>
+      </div>
       <p class="subtitle">Multi-Crew Intelligence System</p>
+      <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+      <div class="header-accent"></div>
     </div>
 
     <!-- Input Section -->
     <div class="input-section">
       <div class="input-group">
-        <label for="focalCompany">Focal Company</label>
-        <input 
-          type="text" 
-          id="focalCompany" 
-          placeholder="Enter focal company (e.g., Samsung)"
-        />
+        <label for="focalCompany">
+          <span class="label-icon">🎯</span>
+          Focal Company
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="focalCompany" 
+            placeholder="Enter focal company (e.g., Samsung)"
+          />
+        </div>
       </div>
 
       <div class="input-group">
-        <label for="competitors">Competitor Companies (max 3)</label>
-        <input 
-          type="text" 
-          id="competitor1" 
-          placeholder="Competitor 1 (e.g., Apple)"
-        />
-        <input 
-          type="text" 
-          id="competitor2" 
-          placeholder="Competitor 2 (e.g., Xiaomi)"
-        />
-        <input 
-          type="text" 
-          id="competitor3" 
-          placeholder="Competitor 3 (e.g., Google)"
-        />
+        <label for="categoryInput">
+          <span class="label-icon">🏢</span>
+          Industry/Category
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="categoryInput" 
+            placeholder="e.g., Smartphones, Cloud Computing, EV Vehicles"
+          />
+        </div>
+      </div>
+
+      <!-- Mode Selector -->
+      <div class="mode-selector">
+        <label class="mode-label">Input Mode:</label>
+        <div class="mode-toggle">
+          <input type="radio" id="aiMode" name="inputMode" value="ai" checked>
+          <label for="aiMode">🤖 AI Suggestions</label>
+          <input type="radio" id="manualMode" name="inputMode" value="manual">
+          <label for="manualMode">✍️ Manual Entry</label>
+        </div>
+      </div>
+
+      <!-- AI Mode Section -->
+      <div class="ai-mode-section" id="aiModeSection">
+        <button class="find-competitors-btn" id="btnFindCompetitors">
+          <span class="btn-icon">🔍</span>
+          <span class="btn-text">Find Competitors</span>
+          <span class="btn-loader" style="display: none;">
+            <span class="loader-spinner"></span>
+          </span>
+        </button>
+
+        <!-- Competitors Container -->
+        <div class="competitors-container" id="competitorsContainer" style="display: none;">
+          <div class="competitors-header">
+            <h3>✨ Suggested Competitors</h3>
+            <button class="retry-btn" id="retryBtn">🔄 Get Different</button>
+          </div>
+          <div class="competitors-checkbox-list" id="competitorsCheckboxList">
+            <!-- Checkboxes will be dynamically inserted here -->
+          </div>
+          <!-- REMOVED: Use Selected and Clear buttons -->
+        </div>
+      </div>
+
+      <!-- Manual Mode Section -->
+      <div class="manual-mode-section" id="manualModeSection" style="display: none;">
+        <div class="input-group">
+          <label for="competitors">
+            <span class="label-icon">⚔️</span>
+            Competitor Companies (max 3)
+          </label>
+          <div class="competitors-grid">
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="competitor1" 
+                placeholder="Competitor 1 (e.g., Apple)"
+              />
+            </div>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="competitor2" 
+                placeholder="Competitor 2 (e.g., Xiaomi)"
+              />
+            </div>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="competitor3" 
+                placeholder="Competitor 3 (e.g., Google)"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Action Buttons -->
     <div class="button-section">
-      <button class="crew-btn" id="btn-crew1" data-crew="comp_analysis">
+      <button class="crew-btn crew-btn-1" id="btn-crew1" data-crew="comp_analysis">
         <span class="btn-icon">🔍</span>
-        <span class="btn-text">Run Competitor Intelligence</span>
-        <span class="btn-loader" style="display: none;">⏳</span>
+        <div class="btn-content">
+          <span class="btn-text">COMPETITOR INTELLIGENCE</span>
+          <span class="btn-subtext">Analyze market position & strategies</span>
+        </div>
+        <span class="btn-loader" style="display: none;">
+          <span class="loader-spinner"></span>
+        </span>
       </button>
 
-      <button class="crew-btn" id="btn-crew2" data-crew="digital_twin">
+      <button class="crew-btn crew-btn-2" id="btn-crew2" data-crew="digital_twin">
         <span class="btn-icon">🧬</span>
-        <span class="btn-text">Run Digital Twin</span>
-        <span class="btn-loader" style="display: none;">⏳</span>
+        <div class="btn-content">
+          <span class="btn-text">DIGITAL TWIN</span>
+          <span class="btn-subtext">Create strategic simulations</span>
+        </div>
+        <span class="btn-loader" style="display: none;">
+          <span class="loader-spinner"></span>
+        </span>
       </button>
 
-      <button class="crew-btn" id="btn-crew3" data-crew="one_last_time">
+      <button class="crew-btn crew-btn-3" id="btn-crew3" data-crew="one_last_time">
         <span class="btn-icon">⚔️</span>
-        <span class="btn-text">Run War Simulation</span>
-        <span class="btn-loader" style="display: none;">⏳</span>
+        <div class="btn-content">
+          <span class="btn-text">WAR SIMULATION</span>
+          <span class="btn-subtext">Run competitive scenarios</span>
+        </div>
+        <span class="btn-loader" style="display: none;">
+          <span class="loader-spinner"></span>
+        </span>
       </button>
     </div>
 
-    <!-- Results Section -->
+    <!-- Results Section - Execution Summary Cards -->
     <div class="results-section" id="resultsSection" style="display: none;">
-      <!-- Results will be dynamically inserted here -->
+      <!-- Execution summary cards will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Settings</h2>
+        <button class="close-modal" id="closeModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="apiKeyInput">Groq API Key</label>
+          <input 
+            type="password" 
+            id="apiKeyInput" 
+            placeholder="Enter your Groq API key"
+          />
+          <small>Get your API key from <a href="https://console.groq.com" target="_blank">console.groq.com</a></small>
+        </div>
+        <div class="modal-actions">
+          <button class="save-btn" id="saveApiKeyBtn">💾 Save</button>
+          <button class="test-btn" id="testApiKeyBtn">🧪 Test Connection</button>
+        </div>
+        <div class="status-message" id="statusMessage" style="display: none;"></div>
+      </div>
     </div>
   </div>
 

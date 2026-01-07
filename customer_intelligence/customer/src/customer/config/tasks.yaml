@@ -1,0 +1,31 @@
+collect_reviews:
+  description: >
+    Collect real customer reviews for competitors: {competitors}.
+    Search G2, Trustpilot, App Store, Play Store, Reddit and forums.
+  expected_output: >
+    Customer reviews grouped by competitor.
+  agent: review_miner
+
+detect_churn:
+  description: >
+    Identify why customers leave or switch from competitors: {competitors}.
+    Focus on phrases like "I left", "I switched", "stopped using".
+  expected_output: >
+    Churn drivers with real customer quotes.
+  agent: churn_detector
+
+find_feature_gaps:
+  description: >
+    Analyze complaints for competitors: {competitors} and find missing or
+    requested features.
+  expected_output: >
+    A ranked list of feature gaps with frequency and urgency.
+  agent: feature_gap_miner
+
+analyze_sentiment:
+  description: >
+    Analyze customer sentiment for competitors: {competitors}.
+    Classify into Love, Hate, Neutral and Frustration.
+  expected_output: >
+    Sentiment breakdown per competitor.
+  agent: sentiment_analyzer

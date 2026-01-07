@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from backend.schemas import WarSimulationRequest
 from war_simulation_agent.orchestrator import get_orchestrator
 import uvicorn
+import os
 
 app = FastAPI(
     title="Samsung War Simulation API",
@@ -20,14 +21,22 @@ app.add_middleware(
 )
 
 @app.post("/simulate")
-def run_war_simulation(payload: WarSimulationRequest):
+def run_war_simulation(payload: WarSimulationRequest, x_groq_api_key: str | None = Header(None, alias="X-Groq-Api-Key")):
     # Validate required fields
     if not payload.our_company or not payload.competitors:
         raise HTTPException(status_code=400, detail="our_company and competitors are required")
-    if len(payload.competitors) != 3:
-        raise HTTPException(status_code=400, detail="competitors must contain exactly 3 names (comma-separated list)")
+    # Accept 1 or more competitors (allow running with fewer than 3; warn instead of rejecting)
+    if len(payload.competitors) < 1:
+        raise HTTPException(status_code=400, detail="competitors must contain at least 1 name")
+    if len(payload.competitors) < 3:
+        # Add a soft warning in the returned payload later via the response body (not an error)
+        warning_note = f"Only {len(payload.competitors)} competitor(s) provided. Proceeding with available competitors."
 
+    old_key = os.environ.get("GROQ_API_KEY")
     try:
+        if x_groq_api_key:
+            os.environ["GROQ_API_KEY"] = x_groq_api_key
+
         orchestrator = get_orchestrator(verbose=False)
 
         # Auto-fill competitive_scenario using our_company
@@ -62,7 +71,16 @@ def run_war_simulation(payload: WarSimulationRequest):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        msg = str(e)
+        if "Invalid API key" in msg or "Invalid API Key" in msg or "invalid_api_key" in msg:
+            raise HTTPException(status_code=401, detail="Invalid Groq API key provided")
+        raise HTTPException(status_code=500, detail=msg)
+    finally:
+        # Restore previous env var
+        if old_key is None:
+            os.environ.pop("GROQ_API_KEY", None)
+        else:
+            os.environ["GROQ_API_KEY"] = old_key
 # ✅ FIX PORT IN CODE
 if __name__ == "__main__":
     uvicorn.run(
